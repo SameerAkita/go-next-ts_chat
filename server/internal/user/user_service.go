@@ -30,7 +30,7 @@ func (s *service) CreateUser(c context.Context, req *CreateUserReq) (*CreateUser
 
 	u := &User{
 		Username: req.Username,
-		Email: req.Email,
+		Email:    req.Email,
 		Password: hashedPassword,
 	}
 
@@ -40,9 +40,9 @@ func (s *service) CreateUser(c context.Context, req *CreateUserReq) (*CreateUser
 	}
 
 	res := &CreateUserRes{
-		ID: strconv.Itoa(int(r.ID)),
+		ID:       strconv.Itoa(int(r.ID)),
 		Username: r.Username,
-		Email: r.Email,
+		Email:    r.Email,
 	}
 
 	return res, nil
