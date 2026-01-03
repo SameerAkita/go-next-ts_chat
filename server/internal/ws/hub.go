@@ -15,3 +15,4 @@ func NewHub() *Hub {
 		Rooms: make(map[string]*Room),
 	}
 }
+
