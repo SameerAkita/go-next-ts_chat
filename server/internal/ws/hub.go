@@ -1,5 +1,7 @@
 package ws
 
+import "log"
+
 type Room struct {
 	ID      string             `json:"id"`
 	Name    string             `json:"name"`
@@ -15,14 +17,19 @@ type Hub struct {
 
 func NewHub() *Hub {
 	return &Hub{
-		Rooms: make(map[string]*Room),
+		Rooms:      make(map[string]*Room),
+		Register:   make(chan *Client),
+		Unregister: make(chan *Client),
+		Broadcast:  make(chan *Message),
 	}
 }
 
 func (h *Hub) Run() {
+	log.Println("HUB RUN LOOP STARTED")
 	for {
 		select {
 		case cl := <-h.Register:
+			log.Println("REGISTERING CLIENT", cl.ID)
 			if _, ok := h.Rooms[cl.RoomID]; ok {
 				r := h.Rooms[cl.RoomID]
 
@@ -35,8 +42,8 @@ func (h *Hub) Run() {
 				if _, ok := h.Rooms[cl.RoomID].Clients[cl.ID]; ok {
 					if len(h.Rooms[cl.RoomID].Clients) != 0 {
 						h.Broadcast <- &Message{
-							Content: "user left the chat",
-							RoomID: cl.RoomID,
+							Content:  "user left the chat",
+							RoomID:   cl.RoomID,
 							Username: cl.Username,
 						}
 					}

@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -49,8 +50,10 @@ var upgrader = websocket.Upgrader{
 }
 
 func (h *Handler) JoinRoom(c *gin.Context) {
+	log.Println("JOIN ROOM HANDLER")
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
+		log.Println("UPGRADE FAILED", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -74,6 +77,7 @@ func (h *Handler) JoinRoom(c *gin.Context) {
 	}
 
 	// register a new client through the register client
+	log.Println("ABOUT TO REGISTER CLIENT", cl.ID)
 	h.hub.Register <- cl
 	// broadcast that message
 	h.hub.Broadcast <- m
@@ -83,16 +87,16 @@ func (h *Handler) JoinRoom(c *gin.Context) {
 }
 
 type RoomRes struct {
-	ID string `json:"id"`
+	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
 func (h *Handler) GetRooms(c *gin.Context) {
 	rooms := make([]RoomRes, 0)
 
-	for _, r := range h.hub.Rooms  {
+	for _, r := range h.hub.Rooms {
 		rooms = append(rooms, RoomRes{
-			ID: r.ID,
+			ID:   r.ID,
 			Name: r.Name,
 		})
 	}
@@ -101,22 +105,23 @@ func (h *Handler) GetRooms(c *gin.Context) {
 }
 
 type ClientRes struct {
-	ID string `json:"id"`
+	ID       string `json:"id"`
 	Username string `json:"username"`
 }
 
 func (h *Handler) GetClients(c *gin.Context) {
 	var clients []ClientRes
 	roomId := c.Param("roomId")
+	log.Println("CLIENT COUNT", len(h.hub.Rooms[roomId].Clients))
 
 	if _, ok := h.hub.Rooms[roomId]; !ok {
 		clients = make([]ClientRes, 0)
 		c.JSON(http.StatusOK, clients)
 	}
 
-	for _, c  := range h.hub.Rooms[roomId].Clients {
+	for _, c := range h.hub.Rooms[roomId].Clients {
 		clients = append(clients, ClientRes{
-			ID: c.ID,
+			ID:       c.ID,
 			Username: c.Username,
 		})
 	}
