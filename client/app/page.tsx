@@ -1,9 +1,14 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import React from 'react'
+import { useRouter } from 'next/navigation'
+
+const Home = () => {
+  const router = useRouter()
+
   return (
-    <>
-      <h1>Hello</h1>
-    </>
-  );
+    router.push('/auth/login')
+  )
 }
+
+export default Home
