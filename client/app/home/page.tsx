@@ -1,16 +1,32 @@
 'use client'
 
 import { API_URL } from '@/constants'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 const home = () => {
-    const [rooms, setRooms] = useState<{ id: string, name: string }[]>([
-        {id: '1', name: 'room1'},
-        {id: '2', name: 'room2'},
-    ])
+    const [rooms, setRooms] = useState<{ id: string, name: string }[]>([])
 
     const [roomName, setRoomName] = useState('')
+
+    const getRooms = async () => {
+        try {
+            const res = await fetch(`${API_URL}/ws/getRooms`, {
+                method: 'GET',
+            })
+
+            const data = await res.json()
+            if (res.ok) {
+                setRooms(data)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    useEffect(() => {
+        getRooms()
+    }, [])
 
     const submitHandler = async (e: React.SyntheticEvent) => {
         e.preventDefault()
