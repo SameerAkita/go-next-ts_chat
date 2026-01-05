@@ -1,14 +1,15 @@
 'use client'
 
-import { API_URL } from '@/constants'
+import { API_URL, WEBSOCKET_URL } from '@/constants'
+import { AuthContext } from '@/modules/auth_provider'
 import { useRouter } from 'next/router'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 const home = () => {
     const [rooms, setRooms] = useState<{ id: string, name: string }[]>([])
-
     const [roomName, setRoomName] = useState('')
+    const { user } = useContext(AuthContext)
 
     const router = useRouter()
 
@@ -55,7 +56,10 @@ const home = () => {
     }
 
     const joinRoom = async (roomId: string) => {
-        
+        const ws = new WebSocket(`${WEBSOCKET_URL}/ws/joinRoom/${roomId}?userId=${user.id}&username=${user.username}`)
+        if (ws.OPEN) {
+            setConn(ws)
+        }
     }
 
   return (
