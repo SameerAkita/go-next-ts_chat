@@ -2,14 +2,18 @@
 
 import { API_URL, WEBSOCKET_URL } from '@/constants'
 import { AuthContext } from '@/modules/auth_provider'
-import { useRouter } from 'next/router'
+import { WebsocketContext } from '@/modules/websocket_provider'
+import { useRouter } from 'next/navigation'
 import React, { useState, useEffect, useContext } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
-const home = () => {
+const Home = () => {
     const [rooms, setRooms] = useState<{ id: string, name: string }[]>([])
     const [roomName, setRoomName] = useState('')
     const { user } = useContext(AuthContext)
+    const { setConn } = useContext(WebsocketContext)
+
+    const router = useRouter()
 
     const getRooms = async () => {
         try {
@@ -57,6 +61,8 @@ const home = () => {
         const ws = new WebSocket(`${WEBSOCKET_URL}/ws/joinRoom/${roomId}?userId=${user.id}&username=${user.username}`)
         if (ws.OPEN) {
             setConn(ws)
+            router.push('/room')
+            return
         }
     }
 
@@ -107,4 +113,4 @@ const home = () => {
   )
 }
 
-export default home
+export default Home
