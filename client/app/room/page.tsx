@@ -1,7 +1,9 @@
 'use client'
 
 import ChatBody from '@/components/chat_body'
-import React, { useState } from 'react'
+import React, { useRef, useState, useContext } from 'react'
+import { WebsocketContext } from '@/modules/websocket_provider'
+import { useRouter } from 'next/navigation'
 
 export type Message = {
     content: string
@@ -12,22 +14,24 @@ export type Message = {
 }
 
 function page() {
-    const [messages, setMessages] = useState<Array<Message>>([
-        {
-            content: 'hello',
-            client_id: '1',
-            username: 'user1',
-            room_id: '1',
-            type: 'self',
-        },
-        {
-            content: 'hello',
-            client_id: '2',
-            username: 'user2',
-            room_id: '1',
-            type: 'receive',
-        },
-    ])
+    const [messages, setMessages] = useState<Array<Message>>([])
+    const textarea = useRef<HTMLTextAreaElement>(null)
+    const { conn } = useContext(WebsocketContext)
+
+    const router = useRouter()
+
+    
+
+    const sendMessage = () => {
+        if (!textarea.current?.value) return
+        if (conn == null) {
+            router.push('/home')
+            return
+        }
+
+        conn.send(textarea.current.value)
+        textarea.current.value = ''
+    }
 
   return (
     <div className='flex flex-col w-full'>
@@ -38,13 +42,17 @@ function page() {
             <div className='flex md:flex-row px-4 py-2 bg-gray-200 md:mx-4 rounded-md'>
                 <div className='flex w-full mr-4 rounded-md border border-blue-500'>
                     <textarea 
+                        ref={textarea}
                         placeholder='type your message here'
                         className='w-full h-10 p-2 rounded-md focus:outline-none bg-white'
                         style={{ resize: 'none' }}
                     />
                 </div>
                 <div className='flex items-center'>
-                    <button className='p-2 rounded-md bg-blue-500 text-white'>
+                    <button 
+                        className='p-2 rounded-md bg-blue-500 text-white'
+                        onClick={sendMessage}
+                    >
                         Send
                     </button>
                 </div>
