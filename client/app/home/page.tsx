@@ -11,8 +11,6 @@ const home = () => {
     const [roomName, setRoomName] = useState('')
     const { user } = useContext(AuthContext)
 
-    const router = useRouter()
-
     const getRooms = async () => {
         try {
             const res = await fetch(`${API_URL}/ws/getRooms`, {
