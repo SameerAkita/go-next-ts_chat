@@ -30,9 +30,9 @@ const home = () => {
 
     const submitHandler = async (e: React.SyntheticEvent) => {
         e.preventDefault()
-
+        console.log('create room')
         try {
-            setRoomName('')
+            
             const res = await fetch(`${API_URL}/ws/createRoom`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
