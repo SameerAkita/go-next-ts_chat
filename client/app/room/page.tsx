@@ -1,6 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
+
+export type Message = {
+    content: string
+    client_id: string
+    username: string
+    room_id: string
+    type: 'recieve' | 'self'
+}
 
 function page() {
+    const [messages, setMessages] = useState<Array<Message>>()
+
   return (
     <div className='flex flex-col w-full'>
         <div className='fixed bottom-0 mt-4 w-full'>
