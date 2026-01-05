@@ -1,19 +1,55 @@
 'use client'
 
+import { API_URL } from '@/constants'
 import React, { useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
 const home = () => {
-    const [rooms, useRooms] = useState<{ id: string, name: string }[]>([
+    const [rooms, setRooms] = useState<{ id: string, name: string }[]>([
         {id: '1', name: 'room1'},
         {id: '2', name: 'room2'},
     ])
+
+    const [roomName, setRoomName] = useState('')
+
+    const submitHandler = async (e: React.SyntheticEvent) => {
+        e.preventDefault()
+
+        try {
+            setRoomName('')
+            const res = await fetch(`${API_URL}/ws/createRoom`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                    id: uuidv4(),
+                    name: roomName,
+                }),
+            })
+
+            if (res.ok) {
+                getRooms()
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
 
   return (
     <>
     <div className='my-8 md:mx-32 w-full h-full px-5'>
         <div className='flex justify-center mt-3 p-5'>
-            <input type='text' className='border border-gray-300 p-2 rounded-md focus:outline-none focus:border-blue-300' placeholder='room name' />
-            <button className='bg-blue-500 border text-white rounded-md p-2 md:ml-4'>
+            <input 
+                type='text' 
+                className='border border-gray-300 p-2 rounded-md focus:outline-none focus:border-blue-300' 
+                placeholder='room name' 
+                value={roomName}
+                onChange={(e) => setRoomName(e.target.value)}
+            />
+            <button 
+                className='bg-blue-500 border text-white rounded-md p-2 md:ml-4'
+                onClick={submitHandler}
+            >
                 create room
             </button>
         </div>
