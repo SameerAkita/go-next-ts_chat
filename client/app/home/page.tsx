@@ -1,6 +1,7 @@
 'use client'
 
 import { API_URL } from '@/constants'
+import { useRouter } from 'next/router'
 import React, { useState, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -8,6 +9,8 @@ const home = () => {
     const [rooms, setRooms] = useState<{ id: string, name: string }[]>([])
 
     const [roomName, setRoomName] = useState('')
+
+    const router = useRouter()
 
     const getRooms = async () => {
         try {
@@ -30,9 +33,9 @@ const home = () => {
 
     const submitHandler = async (e: React.SyntheticEvent) => {
         e.preventDefault()
-        console.log('create room')
+
         try {
-            
+            setRoomName('')
             const res = await fetch(`${API_URL}/ws/createRoom`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -49,6 +52,10 @@ const home = () => {
         } catch (err) {
             console.log(err)
         }
+    }
+
+    const joinRoom = async (roomId: string) => {
+        
     }
 
   return (
@@ -82,7 +89,10 @@ const home = () => {
                             <div className='text-blue-500 font-bold text-lg'>{room.name}</div>
                         </div>
                         <div className=''>
-                            <button className='px-4 text-white bg-blue-500 rounded-md'>
+                            <button 
+                                className='px-4 text-white bg-blue-500 rounded-md'
+                                onClick={() => joinRoom(room.id)}
+                            >
                                 join
                             </button>
                         </div>
