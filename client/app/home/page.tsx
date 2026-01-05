@@ -1,0 +1,46 @@
+'use client'
+
+import React, { useState } from 'react'
+
+const home = () => {
+    const [rooms, useRooms] = useState<{ id: string, name: string }[]>([
+        {id: '1', name: 'room1'},
+        {id: '2', name: 'room2'},
+    ])
+
+  return (
+    <>
+    <div className='my-8 md:mx-32 w-full h-full px-5'>
+        <div className='flex justify-center mt-3 p-5'>
+            <input type='text' className='border border-gray-300 p-2 rounded-md focus:outline-none focus:border-blue-300' placeholder='room name' />
+            <button className='bg-blue-500 border text-white rounded-md p-2 md:ml-4'>
+                create room
+            </button>
+        </div>
+        <div className='mt-6'>
+            <div className='font-bold'>Available Rooms</div>
+            <div className='grid grid-cols-1 md:grid-cols-5 gap-4 mt-6'>
+                {rooms.map((room, index) => (
+                    <div
+                        key={index}
+                        className='border border-blue-500 p-4 flex items-center rounded-md w-full'
+                    >
+                        <div className='w-full'>
+                            <div className='text-sm'>room</div>
+                            <div className='text-blue-500 font-bold text-lg'>{room.name}</div>
+                        </div>
+                        <div className=''>
+                            <button className='px-4 text-white bg-blue-500 rounded-md'>
+                                join
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </div>
+    </>
+  )
+}
+
+export default home

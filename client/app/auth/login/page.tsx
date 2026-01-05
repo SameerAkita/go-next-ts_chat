@@ -1,14 +1,36 @@
+'use client'
+
 import React, { useState } from 'react'
+import { API_URL } from '@/constants'
+import { useRouter } from 'next/navigation'
+import { UserInfo } from '@/modules/auth_provider'
 
 const login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
+    const router = useRouter()
+
     const submitHandler = async (e: React.SyntheticEvent) => {
         e.preventDefault()
 
         try {
-            const res = await fetch('', {})
+            const res = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type' : 'application/json' },
+                body: JSON.stringify({email, password}),
+            })
+
+            const data = await res.json()
+            if (res.ok) {
+                const user: UserInfo = {
+                    username: data.username,
+                    id: data.id,
+                }
+
+                localStorage.setItem('user_info', JSON.stringify(user))
+                return router.push('/home')
+            }
         } catch(err) {
             console.log(err)
         }

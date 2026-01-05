@@ -3,12 +3,12 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 
-const Home = () => {
+const Page = () => {
   const router = useRouter()
 
   return (
-    router.push('/auth/login')
+    router.push('/home')
   )
 }
 
-export default Home
+export default Page
