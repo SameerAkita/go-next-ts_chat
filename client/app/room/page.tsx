@@ -31,7 +31,7 @@ function page() {
 
   return (
     <div className='flex flex-col w-full'>
-        <div>
+        <div className='px-4'>
             <ChatBody data={messages} />
         </div>
         <div className='fixed bottom-0 mt-4 w-full'>
