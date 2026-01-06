@@ -1,9 +1,10 @@
 'use client'
 
 import ChatBody from '@/components/chat_body'
-import React, { useRef, useState, useContext } from 'react'
+import React, { useRef, useState, useContext, useEffect } from 'react'
 import { WebsocketContext } from '@/modules/websocket_provider'
 import { useRouter } from 'next/navigation'
+import { API_URL } from '@/constants'
 
 export type Message = {
     content: string
@@ -17,10 +18,36 @@ function page() {
     const [messages, setMessages] = useState<Array<Message>>([])
     const textarea = useRef<HTMLTextAreaElement>(null)
     const { conn } = useContext(WebsocketContext)
+    const [users, setUsers] = useState<Array<{ username: string }>>()
 
     const router = useRouter()
 
-    
+    // get clients in the room
+    useEffect(() => {
+        if (conn == null) {
+            router.push('/')
+            return
+        }
+
+        const roomId = conn.url.split('/'[5])
+        async function getUsers() {
+            try {
+                const res = await fetch(`${API_URL}/ws/getClients/${roomId}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                })
+
+                const data = await res.json()
+                console.log('data: ', JSON.stringify(data))
+                setUsers(data)
+            } catch (e) {
+                console.error(e)
+            }
+            getUsers()
+        }
+    }, []) 
+
+    useEffect(() => {}, []) // handle websocket connection
 
     const sendMessage = () => {
         if (!textarea.current?.value) return
