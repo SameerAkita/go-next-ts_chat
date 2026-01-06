@@ -5,6 +5,8 @@ import React, { useRef, useState, useContext, useEffect } from 'react'
 import { WebsocketContext } from '@/modules/websocket_provider'
 import { useRouter } from 'next/navigation'
 import { API_URL } from '@/constants'
+import { text } from 'stream/consumers'
+import { AuthContext } from '@/modules/auth_provider'
 
 export type Message = {
     content: string
@@ -18,7 +20,8 @@ function page() {
     const [messages, setMessages] = useState<Array<Message>>([])
     const textarea = useRef<HTMLTextAreaElement>(null)
     const { conn } = useContext(WebsocketContext)
-    const [users, setUsers] = useState<Array<{ username: string }>>()
+    const [users, setUsers] = useState<Array<{ username: string }>>([])
+    const { user } = useContext(AuthContext)
 
     const router = useRouter()
 
@@ -38,7 +41,6 @@ function page() {
                 })
 
                 const data = await res.json()
-                console.log('data: ', JSON.stringify(data))
                 setUsers(data)
             } catch (e) {
                 console.error(e)
@@ -47,7 +49,35 @@ function page() {
         }
     }, []) 
 
-    useEffect(() => {}, []) // handle websocket connection
+    // handle websocket connection
+    useEffect(() => {
+        if (conn == null) {
+            router.push('/')
+            return
+        }
+
+        conn.onmessage = (message) => {
+            const m: Message = JSON.parse(message.data)
+            if (m.content == 'A new user has joined the room') {
+                setUsers([...users, { username: m.username }])
+            }
+
+            if (m.content == 'user left the chat') {
+                const deleteUser = users?.filter((user) => user.username != m.username)
+                setUsers([...deleteUser])
+                setMessages([...messages, m])
+                return
+            }
+
+            user?.username == m.username ? m.type = 'self' : m.type = 'receive'
+            setMessages([...messages, m])
+        }
+
+        // todo
+        conn.onclose = () => {}
+        conn.onerror = () => {}
+        conn.onopen = () => {}
+    }, [messages, textarea, conn, users]) 
 
     const sendMessage = () => {
         if (!textarea.current?.value) return
